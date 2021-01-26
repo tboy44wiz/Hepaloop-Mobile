@@ -1,16 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 //  Import App Packages.
 import 'package:hepaloop/http/Network_Handlers.dart';
-import 'package:hepaloop/models/Doctor_Model.dart';
-import 'package:hepaloop/models/Patient_Model.dart';
 import 'package:hepaloop/routes/api_routes/API_Route_Names.dart';
 import 'package:hepaloop/routes/app_routes/App_Route_Names.dart';
-import 'package:hepaloop/utils/App_SnakBar.dart';
+import 'package:hepaloop/utils/App_SnackBar.dart';
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,9 +17,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   //  Internal Variables.
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
   String _email = '';
   String _password = '';
   String _selectedUser = '';
@@ -30,27 +25,14 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   AutovalidateMode _autoValidateMode = AutovalidateMode.disabled;
 
-  //  Instantiate the AppSnackBar Class.
+  // Class Instances.
   AppSnackBar _appSnackBar = AppSnackBar();
-
-  //  Instantiate the NetworkHandler Class.
   NetworkHandler _networkHandler = NetworkHandler();
+  final FlutterSecureStorage _flutterSecureStorage = new FlutterSecureStorage();
 
-  //  Custom SnackBar.
-  SnackBar _snackBar(String toastMessage) {
-    return SnackBar(
-      content: Text(
-        toastMessage,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      backgroundColor:
-          (_messageType == 'Success') ? (Colors.green[200]) : (Colors.red[300]),
-    );
-  }
+  //  Global Keys.
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -436,6 +418,22 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  //  Custom SnackBar.
+  SnackBar _snackBar(String toastMessage) {
+    return SnackBar(
+      content: Text(
+        toastMessage,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      backgroundColor:
+          (_messageType == 'Success') ? (Colors.green[200]) : (Colors.red[300]),
+    );
+  }
+
   //  Login User.
   Future _loginUser() async {
     //  Validate the Input Fields.
@@ -488,6 +486,7 @@ class _LoginScreenState extends State<LoginScreen> {
        * */
         if (_selectedUser == 'Doctor') {
           var doctorData = responseData['doctor'];
+          // print(doctorData);
 
           Map<String, dynamic> _formattedDoctorData = {
             'id': doctorData['id'],
@@ -499,56 +498,54 @@ class _LoginScreenState extends State<LoginScreen> {
             'isLoggedIn': true,
           };
 
-          //  Save to Shared Preferences.
-          SharedPreferences _sharedPreferenceStorage =
-              await SharedPreferences.getInstance();
+          //  Save to FlutterSecureStorage.
           var _encodedDoctorData = jsonEncode(_formattedDoctorData);
-          _sharedPreferenceStorage.setString(
-              'loggedInUser', _encodedDoctorData);
-
-          //  Get the instance of the Doctors Model Class.
-          Doctor _doctor = new Doctor(
-            id: doctorData['id'],
-            doctorsName: doctorData['doctors_name'],
-            doctorsEmail: doctorData['doctors_email'],
-            doctorsPhone: doctorData['doctors_phone'],
-            doctorsAvatar: doctorData['doctors_avatar'],
+          await _flutterSecureStorage.write(
+            key: 'loggedInUser',
+            value: _encodedDoctorData,
           );
 
           //  Redirect to the Doctor's Dashboard screen.
-          Navigator.pushNamedAndRemoveUntil(
-              context, doctorDashBoardScreen, (Route<dynamic> route) => false);
+          Navigator.pushNamed(context, doctorDashBoardScreen);
         } else if (_selectedUser == 'Patient') {
           var patientData = responseData['patient'];
 
-          //  Save to SHared Preferences.
-          SharedPreferences _sharedPreferenceStorage =
-              await SharedPreferences.getInstance();
-          var encodedPatientData = jsonEncode(patientData);
-          _sharedPreferenceStorage.setString('user', encodedPatientData);
+          Map<String, dynamic> _formattedPatientData = {
+            'id': patientData['id'],
+            'patientsName': patientData['patients_name'],
+            'patientsEmail': patientData['patients_email'],
+            'patientsAvatar': patientData['patients_avatar'],
+            'loggedInAs': 'Patient',
+            'isLoggedIn': true,
+          };
 
-          //  Get the instance of the Patients Model Class.
-          Patient _patient = new Patient(
-            id: patientData['id'],
-            patientsName: patientData['patients_name'],
-            patientsEmail: patientData['patients_email'],
-            patientsAvatar: patientData['patients_avatar'],
+          //  Save to FlutterSecureStorage.
+          var _encodedPatientData = jsonEncode(_formattedPatientData);
+          await _flutterSecureStorage.write(
+            key: 'loggedInUser',
+            value: _encodedPatientData,
           );
 
           //  Redirect to the Patient's Dashboard screen.
-          Navigator.pushReplacementNamed(
-            context,
-            patientDashBoardScreen,
-            arguments: _patient,
-          );
+          Navigator.pushReplacementNamed(context, patientDashBoardScreen);
         } else {
           var pharmacyData = responseData['pharmacy'];
 
-          //  Save to SHared Preferences.
-          SharedPreferences _sharedPreferenceStorage =
-              await SharedPreferences.getInstance();
-          var encodedPharmacy = jsonEncode(pharmacyData);
-          _sharedPreferenceStorage.setString('user', encodedPharmacy);
+          Map<String, dynamic> _formattedPharmacyData = {
+            'id': pharmacyData['id'],
+            'pharmacyName': pharmacyData['pharmacy_name'],
+            'pharmacyEmail': pharmacyData['pharmacy_email'],
+            'pharmacyLogo': pharmacyData['pharmacy_logo'],
+            'loggedInAs': 'Pharmacy',
+            'isLoggedIn': true,
+          };
+
+          //  Save to FlutterSecureStorage.
+          var _encodedPharmacyData = jsonEncode(_formattedPharmacyData);
+          await _flutterSecureStorage.write(
+            key: 'loggedInUser',
+            value: _encodedPharmacyData,
+          );
 
           //  Redirect to the Pharmacy Dashboard screen.
           Navigator.pushReplacementNamed(context, pharmacyDashBoardScreen);
@@ -572,7 +569,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       setState(() {
         _autoValidateMode = AutovalidateMode.onUserInteraction;
-        _isLoading = true;
+        _isLoading = false;
       });
     }
   }

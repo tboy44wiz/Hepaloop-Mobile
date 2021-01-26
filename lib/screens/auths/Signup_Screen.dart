@@ -6,7 +6,7 @@ import 'package:hepaloop/http/Network_Handlers.dart';
 import 'package:hepaloop/routes/api_routes/API_Route_Names.dart';
 import 'package:hepaloop/routes/app_routes/App_Route_Names.dart';
 import 'package:hepaloop/screens/auths/Login_Screen.dart';
-import 'package:hepaloop/utils/App_SnakBar.dart';
+import 'package:hepaloop/utils/App_SnackBar.dart';
 import 'package:http/http.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -305,27 +305,63 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50.0),
                 ),
-                child: Ink(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xff19769F), Color(0xff35D8A6)],
-                    ),
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 0.0,
-                  ),
-                  child: Text(
-                    'SignUp',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
+                child: (!_isLoading)
+                    ? Ink(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xff19769F), Color(0xff35D8A6)],
+                          ),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10.0,
+                          horizontal: 0.0,
+                        ),
+                        child: (Text(
+                          'SignUp',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold),
+                        )),
+                      )
+                    : Ink(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xff19769F), Color(0xff35D8A6)],
+                          ),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8.5,
+                          horizontal: 0.0,
+                        ),
+                        child: (Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 25.0,
+                              width: 25.0,
+                              child: CircularProgressIndicator(
+                                backgroundColor: Colors.white,
+                                strokeWidth: 2.0,
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.all(7.0)),
+                            Text(
+                              'Please wait...',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )),
+                      ),
               ),
             ),
 
@@ -428,6 +464,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       if (isSuccess) {
         setState(() {
+          _isLoading = false;
           _messageType = 'Success';
         });
 
@@ -443,13 +480,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           Map<String, dynamic> _argumentPayload = {
             "id": doctorData['id'],
-            'message': responseBody['message']
+            'message': responseBody['message'],
+            'token': doctorData['token'],
           };
 
           //  Navigate to the UpdateDoctorsAddressScreen.
-          Navigator.pushNamed(
+          Navigator.pushReplacementNamed(
             context,
-            updateDoctorAddressScreen,
+            updateDoctorBioDataScreen,
             arguments: _argumentPayload,
           );
         } else if (_selectedUser == 'Patient') {
@@ -457,13 +495,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           Map<String, dynamic> _argumentPayload = {
             'id': patientData['id'],
-            'message': responseBody['message']
+            'message': responseBody['message'],
+            'token': patientData['token'],
           };
 
           //  Navigate to the UpdatePatientAddressScreen.
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamed(
             context,
-            updatePatientAddressScreen,
+            updatePatientBioDataScreen,
             arguments: _argumentPayload,
           );
         } else {
@@ -483,6 +522,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       } else {
         setState(() {
+          _isLoading = false;
           _messageType = 'Error';
         });
 

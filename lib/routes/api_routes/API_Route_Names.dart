@@ -2,6 +2,16 @@
 const String baseURL = 'https://hepaloop-api.herokuapp.com/api/v1';
 // const String baseURL = 'http://10.0.2.2:5000/api/v1';
 
+//  Base URL for Country, State, City API.
+const countryStateCityBaseURL = 'https://www.universal-tutorial.com/api';
+const countryStateCityAPI_Token =
+    '85UUCHe-uDXQxD48YI60umbGtU3vmTvXTf_lBysFbSdKxK7aW-PjPiarlNhUNmTum7M';
+const userEmail = 'tosolife@yahoo.com';
+const getAccessTokenRoute = '/getaccesstoken';
+const getCountriesRoute = '/countries';
+const getStatesRoute = '/states/';
+const getCitiesRoute = '/cities/';
+
 //  Doctors Screens.
 const String loginDoctorRoute = '/doctors/login';
 const String signUpDoctorRoute = '/doctors/signup';
@@ -10,6 +20,7 @@ const String getAllDoctorsRoute = '/doctors/all_doctors';
 const String getSingleDoctorRoute = '/doctors/single_doctor';
 const String updateDoctorRoute = '/doctors/update_doctor';
 const String deleteDoctorRoute = '/doctors/delete_doctor';
+const String updateDoctorAvatarRoute = '/doctors/update_avatar';
 
 //  Patients Screens.
 const String loginPatientRoute = '/patients/login';

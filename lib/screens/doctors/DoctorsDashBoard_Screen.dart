@@ -2,9 +2,10 @@ import 'dart:convert';
 
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hepaloop/routes/app_routes/App_Route_Names.dart';
 import 'package:hepaloop/screens/patients/MyDoctors_Screen.dart';
-import 'package:hepaloop/utils/App_SnakBar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hepaloop/utils/App_SnackBar.dart';
 
 class DoctorDashBoardScreen extends StatefulWidget {
   @override
@@ -16,31 +17,22 @@ class _DoctorDashBoardScreenState extends State<DoctorDashBoardScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    _getDoctorsDetails();
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _getDoctorsDetails();
+    });
   }
 
+  //  Internal Variables.
   String _id = '';
   String _doctorsName = '';
   String _doctorsEmail = '';
   String _doctorsAvatar = '';
 
-  //  Call the instance of AppSnackBar
+  // Class Instances.
   AppSnackBar _appSnackBar = AppSnackBar();
-
-  void _getDoctorsDetails() async {
-    SharedPreferences _sharedPreferences =
-        await SharedPreferences.getInstance();
-    var _usersData = _sharedPreferences.getString('loggedInUser');
-    Map<String, dynamic> _decodedUSerData = jsonDecode(_usersData);
-
-    setState(() {
-      _id = _decodedUSerData['id'];
-      _doctorsName = _decodedUSerData['doctorsName'];
-      _doctorsEmail = _decodedUSerData['doctorsEmail'];
-      _doctorsAvatar = _decodedUSerData['doctorsAvatar'];
-    });
-  }
+  final FlutterSecureStorage _flutterSecureStorage = new FlutterSecureStorage();
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +94,29 @@ class _DoctorDashBoardScreenState extends State<DoctorDashBoardScreen> {
               onTap: () {},
               leading: Icon(Icons.person),
               title: Text('My Profile'),
-            )
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.ac_unit_rounded),
+              title: Text('Drawer Item'),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.ac_unit_rounded),
+              title: Text('Drawer Item'),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.ac_unit_rounded),
+              title: Text('Drawer Item'),
+            ),
+            ListTile(
+              onTap: () {
+                _logoutDoctor();
+              },
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+            ),
           ],
         ),
       ),
@@ -369,16 +383,31 @@ class _DoctorDashBoardScreenState extends State<DoctorDashBoardScreen> {
       ),
     );
   }
+
+  /*
+  Read the Doctor Details saved in the FlutterSecureStorage
+  FlutterSecureStorage is Just like we do save things in Shared Preference.
+  */
+  void _getDoctorsDetails() async {
+    var _usersData = await _flutterSecureStorage.read(key: 'loggedInUser');
+
+    if (_usersData != null) {
+      Map<String, dynamic> _decodedUSerData = jsonDecode(_usersData);
+
+      setState(() {
+        _id = _decodedUSerData['id'];
+        _doctorsName = _decodedUSerData['doctorsName'];
+        _doctorsEmail = _decodedUSerData['doctorsEmail'];
+        _doctorsAvatar = _decodedUSerData['doctorsAvatar'];
+      });
+    }
+  }
+
+  //  Logout User
+  void _logoutDoctor() async {
+    await _flutterSecureStorage.delete(key: 'loggedInUser');
+
+    //  Return to the Login Screen.
+    Navigator.pushReplacementNamed(context, loginScreen);
+  }
 }
-
-/*
-
-
-setState(() {
-      _id = _decodedUSerData['id'];
-      _doctorsName = _decodedUSerData['doctorsName'];
-      _doctorsEmail = _decodedUSerData['doctorsEmail'];
-      _doctorsAvatar = _decodedUSerData['doctorsAvatar'];
-    });
-
-* */

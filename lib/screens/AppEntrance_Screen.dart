@@ -1,7 +1,7 @@
 import 'package:double_back_to_close_app/double_back_to_close_app.dart';
 import 'package:flutter/material.dart';
 import 'package:hepaloop/routes/app_routes/App_Route_Names.dart';
-import 'package:hepaloop/utils/App_SnakBar.dart';
+import 'package:hepaloop/utils/App_SnackBar.dart';
 
 class AppEntranceScreen extends StatelessWidget {
   //  Call the instance of AppSnackBar

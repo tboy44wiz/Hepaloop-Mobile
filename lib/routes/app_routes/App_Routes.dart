@@ -7,8 +7,10 @@ import 'package:hepaloop/screens/auths/Signup_Screen.dart';
 import 'package:hepaloop/screens/doctors/DoctorsDashBoard_Screen.dart';
 import 'package:hepaloop/screens/doctors/MyPatients_Screen.dart';
 import 'package:hepaloop/screens/doctors/update_doctor/UpdateDoctorsAddress_Screen.dart';
+import 'package:hepaloop/screens/doctors/update_doctor/UpdateDoctorsBioData_Screen.dart';
 import 'package:hepaloop/screens/patients/MyDoctors_Screen.dart';
 import 'package:hepaloop/screens/patients/PatientsDashBoard_Screen.dart';
+import 'package:hepaloop/screens/patients/update_patient/UpdatePatientBioData_Screen.dart';
 import 'package:hepaloop/screens/pharmacy/PharmacyDashBoard_Screen.dart';
 
 class RouteGenerator {
@@ -19,62 +21,82 @@ class RouteGenerator {
     //  Change Route Names;
     switch (routeName) {
 
+      //////////////////////////////////////////////////////////////////////////
       //  Walk-Through Screens.
       case appHomeScreen:
         return MaterialPageRoute(builder: (context) => AppHomeScreen());
         break;
+
       case appEntryScreen:
         return MaterialPageRoute(builder: (context) => AppEntranceScreen());
         break;
 
+      //////////////////////////////////////////////////////////////////////////
       //  Auth Screens.
       case loginScreen:
         return MaterialPageRoute(builder: (context) => LoginScreen());
         break;
+
       case signUpScreen:
         return MaterialPageRoute(builder: (context) => SignUpScreen());
         break;
 
+      //////////////////////////////////////////////////////////////////////////
       //  Doctors Screens.
       case doctorDashBoardScreen:
         return MaterialPageRoute(builder: (context) => DoctorDashBoardScreen());
         break;
+
       case myPatientScreen:
         return MaterialPageRoute(builder: (context) => MyPatientsScreen());
         break;
+
       case doctorBioDataScreen:
         return MaterialPageRoute(builder: (context) => null); // TODO
         break;
+
       case updateDoctorBioDataScreen:
-        return MaterialPageRoute(builder: (context) => null); // TODO
-        break;
-      case updateDoctorAddressScreen:
         return MaterialPageRoute(
-          builder: (context) =>
-              UpdateDoctorsAddressScreen(routeArguments: routeArguments),
-        ); // TODO
+          builder: (context) => UpdateDoctorsBioDataScreen(
+            routeArguments: routeArguments,
+          ),
+        );
         break;
 
+      case updateDoctorAddressScreen:
+        return MaterialPageRoute(
+          builder: (context) => UpdateDoctorsAddressScreen(
+            routeArguments: routeArguments,
+          ),
+        );
+        break;
+
+      //////////////////////////////////////////////////////////////////////////
       //  Patients Screens.
       case patientDashBoardScreen:
         return MaterialPageRoute(
-            builder: (context) => PatientDashBoardScreen(
-                  patientDetail: routeArguments,
-                ));
+            builder: (context) => PatientDashBoardScreen());
         break;
+
       case myDoctorScreen:
         return MaterialPageRoute(builder: (context) => MyDoctorsScreen());
         break;
+
       case patientBioDataScreen:
         return MaterialPageRoute(builder: (context) => null); // TODO
         break;
+
       case updatePatientBioDataScreen:
-        return MaterialPageRoute(builder: (context) => null); // TODO
+        return MaterialPageRoute(
+            builder: (context) =>
+                UpdatePatientBioDataScreen(routeArguments: routeArguments));
         break;
+
       case updatePatientAddressScreen:
         return MaterialPageRoute(builder: (context) => null); // TODO
         break;
 
+      //////////////////////////////////////////////////////////////////////////
       //  Pharmacy Screens.
       case pharmacyDashBoardScreen:
         return MaterialPageRoute(

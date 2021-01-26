@@ -1,88 +1,133 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:hepaloop/models/Patient_Model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hepaloop/routes/app_routes/App_Route_Names.dart';
 import 'package:hepaloop/screens/patients/MyDoctors_Screen.dart';
 
-class PatientDashBoardScreen extends StatelessWidget {
-  final Patient patientDetail;
-
-  const PatientDashBoardScreen({Key key, this.patientDetail}) : super(key: key);
-
+class PatientDashBoardScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    String _id = patientDetail.id;
-    String _patientsName = patientDetail.patientsName;
-    String _patientsEmail = patientDetail.patientsEmail;
-    String _patientsAvatar = patientDetail.patientsAvatar;
+  _PatientDashBoardScreenState createState() => _PatientDashBoardScreenState();
+}
 
+class _PatientDashBoardScreenState extends State<PatientDashBoardScreen> {
+  @override
+
+  //  Get the Initial State.
+  @override
+  void initState() {
+    // TODO: implement initState
+    _getPatientsDetails();
+    super.initState();
+  }
+
+  //  State Variables.
+  String _id = '';
+  String _patientsName = '';
+  String _patientsEmail = '';
+  String _patientsAvatar = '';
+
+  //  Class Instances.
+  final FlutterSecureStorage _flutterSecureStorage = new FlutterSecureStorage();
+
+  void _getPatientsDetails() async {
+    var _usersData = await _flutterSecureStorage.read(key: 'loggedInUser');
+
+    if (_usersData != null) {
+      Map<String, dynamic> _decodedUSerData = jsonDecode(_usersData);
+
+      setState(() {
+        _id = _decodedUSerData['id'];
+        _patientsName = _decodedUSerData['patientsName'];
+        _patientsEmail = _decodedUSerData['patientsEmail'];
+        _patientsAvatar = _decodedUSerData['patientsAvatar'];
+      });
+    }
+  }
+
+  Widget build(BuildContext context) {
     return Scaffold(
       //  Drawer
       drawer: Drawer(
         child: ListView(
           children: [
             DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                ),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(_patientsAvatar),
-                          radius: 45.0,
-                        ),
-                        Text(
-                          _patientsName,
-                          style: TextStyle(
-                            color: Color(0xff19769F),
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          _patientsEmail,
-                          style: TextStyle(
-                            color: Color(0xff19769F),
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Positioned(
-                      top: -3.0,
-                      right: -15.0,
-                      child: RaisedButton(
-                        onPressed: () {},
-                        color: Colors.blue,
-                        elevation: 5.0,
-                        shape: CircleBorder(),
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(_patientsAvatar),
+                        radius: 45.0,
+                      ),
+                      Text(
+                        _patientsName,
+                        style: TextStyle(
+                          color: Color(0xff19769F),
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    /*Positioned(
-                      top: 50,
-                      right: 65.0,
-                      child: RaisedButton(
-                        onPressed: () {},
-                        color: Colors.blue,
-                        elevation: 5.0,
-                        shape: CircleBorder(),
-                        child: Icon(
-                          Icons.add_a_photo_rounded,
-                          color: Colors.white,
-                          size: 18.0,
+                      Text(
+                        _patientsEmail,
+                        style: TextStyle(
+                          color: Color(0xff19769F),
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
-                    ),*/
-                  ],
-                ))
+                    ],
+                  ),
+                  Positioned(
+                    top: -3.0,
+                    right: -15.0,
+                    child: RaisedButton(
+                      onPressed: () {},
+                      color: Colors.blue,
+                      elevation: 5.0,
+                      shape: CircleBorder(),
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.person),
+              title: Text('My Profile'),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.ac_unit_rounded),
+              title: Text('Drawer Item'),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.ac_unit_rounded),
+              title: Text('Drawer Item'),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.ac_unit_rounded),
+              title: Text('Drawer Item'),
+            ),
+            ListTile(
+              onTap: () {
+                _logoutPatient();
+              },
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+            ),
           ],
         ),
       ),
@@ -343,5 +388,12 @@ class PatientDashBoardScreen extends StatelessWidget {
         elevation: 25.0,
       ),
     );
+  }
+
+  void _logoutPatient() async {
+    await _flutterSecureStorage.delete(key: 'loggedInUser');
+
+    //  Return to the Login Screen.
+    Navigator.pushReplacementNamed(context, loginScreen);
   }
 }

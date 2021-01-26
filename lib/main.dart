@@ -1,15 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hepaloop/routes/app_routes/App_Route_Names.dart';
 import 'package:hepaloop/routes/app_routes/App_Routes.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final SharedPreferences _sharedPreferences =
-      await SharedPreferences.getInstance();
-  String _loggedInUser = (_sharedPreferences.getString('loggedInUser') ?? '');
+
+  //  Class Instances.
+  FlutterSecureStorage _flutterSecureStorage = new FlutterSecureStorage();
+
+  String _loggedInUser =
+      (await _flutterSecureStorage.read(key: 'loggedInUser') ?? '');
 
   var _decodedLoggedInUser;
   try {
